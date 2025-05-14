@@ -325,7 +325,7 @@ class AutoDrawerApp:
     def __init__(self, root_window):
         self.root = root_window
         self.root.title("秋收冬藏") # 应用程序标题
-        self.root.geometry("600x750") # 窗口大小
+        self.root.geometry("650x750") # 窗口大小
         self.root.protocol("WM_DELETE_WINDOW", self.on_close) # 设置关闭窗口时的回调
 
         self.selector = None # 用于截图选择器窗口实例
@@ -355,9 +355,14 @@ class AutoDrawerApp:
         self.process_button = ttk.Button(controls_frame, text="2. 生成线稿", command=self.process_image_button_action, state=tk.DISABLED)
         self.process_button.pack(fill=tk.X, pady=5)
         
+        # 创建一个新的框架来容纳参数区域，使它们在同一行显示
+        parameter_row_frame = ttk.Frame(controls_frame)
+        parameter_row_frame.pack(fill=tk.X, pady=10)
+
         # Canny 参数
-        param_frame = ttk.LabelFrame(controls_frame, text="线稿参数 (Canny Edge)")
-        param_frame.pack(fill=tk.X, pady=10)
+        param_frame = ttk.LabelFrame(parameter_row_frame, text="线稿参数 (Canny Edge)") # 修改父框架
+        # 修改 pack 选项以水平排列
+        param_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 5), pady=5)
 
         ttk.Label(param_frame, text="阈值1:").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.canny_thresh1_scale = ttk.Scale(param_frame, from_=0, to=255, orient=tk.HORIZONTAL, length=150)
@@ -381,8 +386,9 @@ class AutoDrawerApp:
         self.invert_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky="w")
 
         # 绘画参数
-        draw_param_frame = ttk.LabelFrame(controls_frame, text="绘画参数")
-        draw_param_frame.pack(fill=tk.X, pady=10)
+        draw_param_frame = ttk.LabelFrame(parameter_row_frame, text="绘画参数") # 修改父框架
+        # 修改 pack 选项以水平排列
+        draw_param_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(5, 0), pady=5)
 
         ttk.Label(draw_param_frame, text="绘制延迟 (ms):").grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.draw_delay_scale = ttk.Scale(draw_param_frame, from_=0, to=100, orient=tk.HORIZONTAL, length=150) # 0 到 100 毫秒延迟
