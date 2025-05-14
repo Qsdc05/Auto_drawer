@@ -128,7 +128,7 @@ def convert_to_linework(pil_image, canny_threshold1, canny_threshold2, invert_co
         return None
 
 # --- 自动绘画功能 ---
-def drawing_task(image_to_draw, start_x, start_y, draw_delay, pixel_skip):
+def drawing_task(image_to_draw, start_x, start_y, draw_delay, pixel_skip, pyautogui_pause_val): # 添加新参数 pyautogui_pause_val
     global drawing_active
     if image_to_draw is None:
         print("没有线稿图像可供绘制。")
@@ -136,7 +136,7 @@ def drawing_task(image_to_draw, start_x, start_y, draw_delay, pixel_skip):
         return
 
     original_pyautogui_pause = pyautogui.PAUSE # 存储原始的 PAUSE 值
-    pyautogui.PAUSE = 0.0  # 在绘画期间将 PAUSE 设置为 0.0 以提高速度
+    pyautogui.PAUSE = pyautogui_pause_val  # 使用从GUI控件获取的值
 
     try:
         pyautogui.FAILSAFE = False # 禁用 pyautogui 的 failsafe 功能
@@ -285,9 +285,11 @@ def on_press(key):
                     draw_delay_val = app.draw_delay_scale.get() if hasattr(app, 'draw_delay_scale') else 10
                     # 在此处将 pixel_skip_val 转换为 int
                     pixel_skip_val = int(app.pixel_skip_scale.get()) if hasattr(app, 'pixel_skip_scale') else 1
+                    # 获取 pyautogui_pause 的值
+                    pyautogui_pause_val = app.pyautogui_pause_scale.get() if hasattr(app, 'pyautogui_pause_scale') else 0.0
 
                     drawing_thread = threading.Thread(target=drawing_task, 
-                                                      args=(linework_pil_image, start_x, start_y, draw_delay_val, pixel_skip_val),
+                                                      args=(linework_pil_image, start_x, start_y, draw_delay_val, pixel_skip_val, pyautogui_pause_val), # 添加新参数
                                                       daemon=True)
                     drawing_thread.start()
             else:
@@ -398,6 +400,16 @@ class AutoDrawerApp:
         self.pixel_skip_scale.config(command=lambda v: self.pixel_skip_val_label.config(text=f"{float(v):.0f}"))
         self.pixel_skip_val_label.grid(row=1, column=2, padx=5, pady=5)
 
+
+        # 新增 PyAutoGUI PAUSE 控件
+        ttk.Label(draw_param_frame, text="移动间隔(s):").grid(row=2, column=0, padx=5, pady=5, sticky="w")
+        self.pyautogui_pause_scale = ttk.Scale(draw_param_frame, from_=0.0, to=0.1, orient=tk.HORIZONTAL, length=150)
+        self.pyautogui_pause_scale.set(0.0) # 默认值为 0.0
+        self.pyautogui_pause_scale.grid(row=2, column=1, padx=5, pady=5)
+        self.pyautogui_pause_val_label = ttk.Label(draw_param_frame, text="0.000")
+        # 更新标签显示，并格式化为三位小数
+        self.pyautogui_pause_scale.config(command=lambda v: self.pyautogui_pause_val_label.config(text=f"{float(v):.3f}"))
+        self.pyautogui_pause_val_label.grid(row=2, column=2, padx=5, pady=5)
 
         self.help_button = ttk.Button(controls_frame, text="帮助/说明", command=self.show_help)
         self.help_button.pack(fill=tk.X, pady=(20,5))
