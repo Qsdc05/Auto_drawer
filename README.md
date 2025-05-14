@@ -52,5 +52,7 @@
 - numpy
 ## 致谢
 感谢所有开源库的贡献者。
+## 打包下载地址
+https://wwgs.lanzoue.com/iHdnt2w7maze密码:qsdc
 
 如有问题或建议，欢迎反馈！
